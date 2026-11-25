@@ -1,0 +1,406 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="screen-orientation" content="landscape" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>ARENA CLASH — Batalha em Arena</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Aviso de Orientação Retrato em Dispositivos Móveis -->
+  <div id="portrait-warning" class="overlay-warning hidden">
+    <div class="warning-card">
+      <div class="rotate-icon">📱↻</div>
+      <h2>GIRE O DISPOSITIVO</h2>
+      <p>Este jogo foi projetado para o modo horizontal (Paisagem).</p>
+      <button id="btn-force-landscape" class="btn btn-primary">ATIVAR TELA CHEIA / HORIZONTAL</button>
+    </div>
+  </div>
+
+  <!-- TELA 1: MENU PRINCIPAL -->
+  <section id="screen-menu" class="screen active">
+    <div class="bg-pattern"></div>
+    <header class="top-bar">
+      <div class="player-badge">
+        <div class="avatar-circle" id="menu-avatar">A</div>
+        <div class="player-meta">
+          <span class="player-name">JOGADOR</span>
+          <span class="net-status" title="Arquitetura preparada para WebSocket/WebRTC">MODO OFFLINE (BOTS IA)</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button id="btn-fullscreen-menu" class="btn btn-icon" title="Tela Cheia">⛶</button>
+        <button id="btn-open-settings" class="btn btn-secondary">⚙ CONFIGURAÇÕES</button>
+      </div>
+    </header>
+
+    <main class="menu-center">
+      <div class="selected-hero-showcase">
+        <canvas id="showcase-canvas" width="260" height="260"></canvas>
+        <div class="hero-plate">
+          <span id="menu-hero-role" class="hero-tag">INVESTIDA SOMBRIA</span>
+          <h2 id="menu-hero-name">ANA</h2>
+        </div>
+      </div>
+
+      <div class="menu-controls-panel">
+        <div class="game-logo">
+          <span class="logo-sub">ORIGINAL ARENA BRAWLER</span>
+          <h1>ARENA<span>CLASH</span></h1>
+        </div>
+
+        <div class="selector-cards">
+          <button id="btn-open-heroes" class="card-btn">
+            <span class="card-label">PERSONAGEM</span>
+            <strong id="card-hero-val">ANA</strong>
+            <small>Trocar Lutador (7)</small>
+          </button>
+
+          <button id="btn-open-gears" class="card-btn">
+            <span class="card-label">ENGRENAGENS</span>
+            <strong id="card-gears-val">VELOCIDADE • FORÇA</strong>
+            <small>Equipar 2 Slots</small>
+          </button>
+
+          <button id="btn-open-modes" class="card-btn">
+            <span class="card-label">MODO DE JOGO</span>
+            <strong id="card-mode-val">EQUIPE 3v3</strong>
+            <small id="card-mode-desc">6 Modos • Mapa 1/3</small>
+          </button>
+        </div>
+
+        <button id="btn-play" class="btn btn-play">
+          <span>JOGAR</span>
+          <small>SORTEAR ARENA E INICIAR</small>
+        </button>
+      </div>
+    </main>
+  </section>
+
+  <!-- TELA 2: SELEÇÃO DE PERSONAGENS -->
+  <section id="screen-heroes" class="screen">
+    <header class="sub-header">
+      <button class="btn btn-back" data-back="screen-menu">← VOLTAR</button>
+      <h2>ESCOLHA SEU LUTADOR</h2>
+      <div class="spacer"></div>
+    </header>
+    <div class="heroes-layout">
+      <div id="hero-grid" class="hero-grid"></div>
+      <aside class="hero-details" id="hero-details-panel">
+        <div class="detail-header">
+          <h3 id="det-name">ANA</h3>
+          <span id="det-archetype" class="badge">INVESTIDA RÁPIDA</span>
+        </div>
+        <p id="det-desc" class="det-desc"></p>
+        <div class="stat-bars">
+          <div class="stat-row"><span>VIDA</span><div class="bar"><div id="stat-hp"></div></div><strong id="val-hp"></strong></div>
+          <div class="stat-row"><span>DANO</span><div class="bar"><div id="stat-dmg"></div></div><strong id="val-dmg"></strong></div>
+          <div class="stat-row"><span>VELOCIDADE</span><div class="bar"><div id="stat-spd"></div></div><strong id="val-spd"></strong></div>
+          <div class="stat-row"><span>ALCANCE</span><div class="bar"><div id="stat-rng"></div></div><strong id="val-rng"></strong></div>
+        </div>
+        <div class="ability-box">
+          <div><strong>ATAQUE BÁSICO:</strong> <span id="det-atk"></span></div>
+          <div><strong>HABILIDADE ESPECIAL:</strong> <span id="det-ult"></span></div>
+        </div>
+        <button id="btn-confirm-hero" class="btn btn-primary full-w">SELECIONAR LUTADOR</button>
+      </aside>
+    </div>
+  </section>
+
+  <!-- TELA 3: MENU DE ENGRENAGENS -->
+  <section id="screen-gears" class="screen">
+    <header class="sub-header">
+      <button class="btn btn-back" data-back="screen-menu">← VOLTAR</button>
+      <h2>ENGRENAGENS DE COMBATE (<span id="gears-hero-title">ANA</span>)</h2>
+      <div class="spacer"></div>
+    </header>
+    <div class="gears-layout">
+      <div class="equipped-slots">
+        <h3>SLOTS EQUIPADOS (2)</h3>
+        <div class="slots-row">
+          <div id="slot-gear-0" class="gear-slot active-slot" data-slot="0">
+            <span class="slot-num">SLOT 1</span>
+            <strong id="slot-0-name">VELOCIDADE</strong>
+            <span id="slot-0-rarity" class="rarity-pill">RARA</span>
+          </div>
+          <div id="slot-gear-1" class="gear-slot" data-slot="1">
+            <span class="slot-num">SLOT 2</span>
+            <strong id="slot-1-name">FORÇA</strong>
+            <span id="slot-1-rarity" class="rarity-pill">COMUM</span>
+          </div>
+        </div>
+        <div class="rarity-selector-box">
+          <label>NÍVEL DE PODER DO SLOT SELECIONADO:</label>
+          <div id="rarity-buttons" class="rarity-btns">
+            <button class="rar-btn" data-rarity="common">COMUM (10s)</button>
+            <button class="rar-btn" data-rarity="rare">RARA (16s)</button>
+            <button class="rar-btn" data-rarity="epic">ÉPICA (23s)</button>
+            <button class="rar-btn" data-rarity="legendary">LENDÁRIA (32s)</button>
+          </div>
+        </div>
+        <p class="gear-hint">Toque em um slot acima e escolha uma engrenagem ao lado para equipar.</p>
+      </div>
+      <div id="gears-catalog" class="gears-catalog"></div>
+    </div>
+  </section>
+
+  <!-- TELA 4: SELEÇÃO DE MODOS (6 MODOS) -->
+  <section id="screen-modes" class="screen">
+    <header class="sub-header">
+      <button class="btn btn-back" data-back="screen-menu">← VOLTAR</button>
+      <h2>MODOS DE BATALHA (6 MODOS)</h2>
+      <div class="spacer"></div>
+    </header>
+    <div class="modes-grid">
+      <div class="mode-card selected" data-mode="3v3">
+        <div class="mode-icon">⚔️</div>
+        <h3>BATALHA EM EQUIPE 3v3</h3>
+        <p>Dois times de 3 lutadores. 10 eliminações ou maior placar em 2:00 vence. Respawn ativo.</p>
+        <span class="mode-meta">3 AZUL vs 3 VERMELHO • RESPAWN 3.5s</span>
+      </div>
+      <div class="mode-card" data-mode="survival">
+        <div class="mode-icon">👑</div>
+        <h3>SOBREVIVÊNCIA</h3>
+        <p>8 lutadores sem respawn. Último sobrevivente vence com arena encolhendo aos poucos.</p>
+        <span class="mode-meta">8 JOGADORES • SEM RESPAWN</span>
+      </div>
+      <div class="mode-card" data-mode="ffa">
+        <div class="mode-icon">🔥</div>
+        <h3>BATALHA LIVRE</h3>
+        <p>6 lutadores todos contra todos com respawn rápido. 8 eliminações ou líder em 2:00 vence.</p>
+        <span class="mode-meta">6 JOGADORES • TODOS CONTRA TODOS</span>
+      </div>
+      <div class="mode-card" data-mode="zone">
+        <div class="mode-icon">🎯</div>
+        <h3>ZONA ESTRATÉGICA</h3>
+        <p>Dispute o círculo central com sua equipe. Quem controla a zona soma pontos até 100.</p>
+        <span class="mode-meta">3v3 • META 100 PONTOS</span>
+      </div>
+      <div class="mode-card" data-mode="brawlball">
+        <div class="mode-icon">⚽</div>
+        <h3>FUTBRAWL</h3>
+        <p>Futebol em arena 3v3! Empurre e chute a bola com ataques para marcar 3 gols no adversário.</p>
+        <span class="mode-meta">3v3 • PRIMEIRO A 3 GOLS</span>
+      </div>
+      <div class="mode-card" data-mode="gemgrab">
+        <div class="mode-icon">💎</div>
+        <h3>PIQUE-GEMA</h3>
+        <p>Colete gemas no centro, derrube gemas ao ser eliminado e segure 10+ gemas por 10s.</p>
+        <span class="mode-meta">3v3 • CONTAGEM DE 10s COM 10+ GEMAS</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TELA 5: CONFIGURAÇÕES -->
+  <section id="screen-settings" class="screen">
+    <header class="sub-header">
+      <button class="btn btn-back" data-back="screen-menu">← VOLTAR</button>
+      <h2>CONFIGURAÇÕES</h2>
+      <div class="spacer"></div>
+    </header>
+    <div class="settings-container">
+      <div class="setting-item">
+        <div>
+          <strong>Personalizar HUD (Controles na Tela)</strong>
+          <p>Arraste analógico, ataque, habilidade e engrenagens e ajuste o tamanho.</p>
+        </div>
+        <button id="btn-open-hud-editor" class="btn btn-primary">PERSONALIZAR HUD</button>
+      </div>
+      <div class="setting-item">
+        <div>
+          <strong>Modo de Controle na Tela</strong>
+          <p>Exibir controles virtuais de toque automaticamente ou sempre visíveis.</p>
+        </div>
+        <select id="select-touch-mode" class="select-input">
+          <option value="auto">Automático (Toque / Celular)</option>
+          <option value="always">Sempre Visível</option>
+          <option value="hidden">Ocultar (Apenas Teclado/Mouse)</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <div>
+          <strong>Efeitos Sonoros Sintetizados (WebAudio)</strong>
+          <p>Disparos, explosões, investidas, gols, gemas e engrenagens.</p>
+        </div>
+        <input type="checkbox" id="chk-sound" checked class="toggle-chk" />
+      </div>
+      <div class="setting-item">
+        <div>
+          <strong>Tela Cheia</strong>
+          <p>Alternar modo tela cheia para melhor experiência em arena.</p>
+        </div>
+        <button id="btn-fullscreen-settings" class="btn btn-secondary">ALTERNAR TELA CHEIA</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TELA 6: EDITOR / PERSONALIZAÇÃO DE HUD -->
+  <section id="screen-hud-editor" class="screen">
+    <div class="hud-editor-arena-preview">
+      <div class="editor-grid-bg"></div>
+      <div class="editor-toolbar">
+        <button id="btn-hud-back" class="btn btn-secondary">✓ CONCLUIR E SALVAR</button>
+        <div class="size-slider-box">
+          <span>TAMANHO DO BOTÃO SELECIONADO:</span>
+          <input type="range" id="hud-size-slider" min="0.6" max="1.6" step="0.05" value="1" />
+          <strong id="hud-size-val">100%</strong>
+        </div>
+        <button id="btn-hud-reset" class="btn btn-danger">RESTAURAR PADRÃO</button>
+      </div>
+
+      <p class="editor-tip">Arraste qualquer controle abaixo para posicionar. Toque em um controle para alterar sua escala.</p>
+
+      <!-- Elementos arrastáveis do HUD -->
+      <div id="edit-ctrl-joystick" class="hud-draggable" data-ctrl="joystick">
+        <div class="mock-joy"><div class="mock-knob"></div></div>
+        <span>ANALÓGICO</span>
+      </div>
+      <div id="edit-ctrl-attack" class="hud-draggable" data-ctrl="attack">
+        <div class="mock-btn atk">⚔️</div>
+        <span>ATAQUE</span>
+      </div>
+      <div id="edit-ctrl-super" class="hud-draggable" data-ctrl="super">
+        <div class="mock-btn sup">⚡</div>
+        <span>ESPECIAL</span>
+      </div>
+      <div id="edit-ctrl-gear0" class="hud-draggable" data-ctrl="gear0">
+        <div class="mock-btn gr">G1</div>
+        <span>ENG. 1</span>
+      </div>
+      <div id="edit-ctrl-gear1" class="hud-draggable" data-ctrl="gear1">
+        <div class="mock-btn gr">G2</div>
+        <span>ENG. 2</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TELA 7: SORTEIO / APRESENTAÇÃO DO MAPA -->
+  <section id="screen-map-roulette" class="screen">
+    <div class="roulette-box">
+      <span class="roulette-tag">SORTEANDO ARENA DE COMBATE (PROBABILIDADE 1/3)</span>
+      <div class="roulette-cards" id="roulette-cards">
+        <div class="r-card" data-map="0">
+          <div class="r-preview solar"></div>
+          <h3>TEMPLO SOLAR</h3>
+          <p>Ruínas douradas simétricas com pilares de cobertura.</p>
+        </div>
+        <div class="r-card" data-map="1">
+          <div class="r-preview cyber"></div>
+          <h3>LABORATÓRIO NEON</h3>
+          <p>Corredores tecnológicos com núcleos centrais abertos.</p>
+        </div>
+        <div class="r-card" data-map="2">
+          <div class="r-preview canyon"></div>
+          <h3>CÂNION VULCÂNICO</h3>
+          <p>Formações rochosas densas e passagens estreitas.</p>
+        </div>
+      </div>
+      <div id="roulette-status" class="roulette-status">SORTEANDO...</div>
+    </div>
+  </section>
+
+  <!-- TELA 8: ARENA DE BATALHA -->
+  <section id="screen-battle" class="screen">
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD Superior da Partida -->
+    <div class="battle-top-hud">
+      <div class="match-score-box" id="hud-score-panel">
+        <span class="team-blue" id="hud-score-left">AZUL: 0</span>
+        <span class="match-timer" id="hud-timer">02:00</span>
+        <span class="team-red" id="hud-score-right">VERM: 0</span>
+      </div>
+      <div class="map-name-pill" id="hud-map-title">TEMPLO SOLAR</div>
+      <div class="battle-top-btns">
+        <button id="btn-battle-fs" class="btn-mini">⛶</button>
+        <button id="btn-quit-match" class="btn-mini danger">✕ SAIR</button>
+      </div>
+    </div>
+
+    <!-- Banner de Contagem Regressiva (Pique-Gema) / Eventos -->
+    <div id="mode-alert-banner" class="mode-alert-banner hidden"></div>
+
+    <!-- Feed de Eliminações -->
+    <div id="kill-feed" class="kill-feed"></div>
+
+    <!-- Aviso de Respawn -->
+    <div id="respawn-banner" class="respawn-banner hidden">
+      <span>VOCÊ FOI ELIMINADO!</span>
+      <strong id="respawn-countdown">3.5s</strong>
+    </div>
+
+    <!-- Controles Virtuais (Celular / Toque) -->
+    <div id="touch-controls-layer" class="touch-layer">
+      <!-- Analógico Esquerdo -->
+      <div id="ctrl-joystick" class="hud-control joystick-base">
+        <div id="joystick-knob" class="joystick-knob"></div>
+      </div>
+
+      <!-- Botão de Ataque (Segurar para Mirar, Soltar para Disparar) -->
+      <div id="ctrl-attack" class="hud-control action-btn attack-btn">
+        <svg class="ring-svg" viewBox="0 0 100 100">
+          <circle class="ring-bg" cx="50" cy="50" r="44"></circle>
+          <circle id="ammo-ring" class="ring-fill" cx="50" cy="50" r="44"></circle>
+        </svg>
+        <span class="btn-glyph">⚔️</span>
+        <span id="ammo-count-label" class="btn-sub">3/3</span>
+      </div>
+
+      <!-- Botão de Habilidade Especial -->
+      <div id="ctrl-super" class="hud-control action-btn super-btn locked">
+        <svg class="ring-svg" viewBox="0 0 100 100">
+          <circle class="ring-bg" cx="50" cy="50" r="44"></circle>
+          <circle id="super-ring" class="ring-fill" cx="50" cy="50" r="44"></circle>
+        </svg>
+        <span class="btn-glyph">⚡</span>
+        <span id="super-pct-label" class="btn-sub">0%</span>
+      </div>
+
+      <!-- Engrenagem 1 -->
+      <div id="ctrl-gear0" class="hud-control gear-btn">
+        <svg class="ring-svg" viewBox="0 0 100 100">
+          <circle class="ring-bg" cx="50" cy="50" r="44"></circle>
+          <circle id="gear0-ring" class="ring-fill" cx="50" cy="50" r="44"></circle>
+        </svg>
+        <span id="gear0-icon" class="btn-glyph">⚡</span>
+        <span id="gear0-timer" class="btn-sub">PRONTO</span>
+      </div>
+
+      <!-- Engrenagem 2 -->
+      <div id="ctrl-gear1" class="hud-control gear-btn">
+        <svg class="ring-svg" viewBox="0 0 100 100">
+          <circle class="ring-bg" cx="50" cy="50" r="44"></circle>
+          <circle id="gear1-ring" class="ring-fill" cx="50" cy="50" r="44"></circle>
+        </svg>
+        <span id="gear1-icon" class="btn-glyph">💪</span>
+        <span id="gear1-timer" class="btn-sub">PRONTO</span>
+      </div>
+    </div>
+
+    <!-- Dica rápida para PC -->
+    <div id="pc-controls-hint" class="pc-hint">
+      WASD: Mover • Segurar Clique Esq: Mirar • Soltar: Atacar • Botão Dir / Espaço: Especial • [1] e [2]: Engrenagens
+    </div>
+  </section>
+
+  <!-- TELA 9: RESULTADO DA PARTIDA (VITÓRIA / DERROTA) -->
+  <section id="screen-result" class="screen">
+    <div class="result-card" id="result-card-box">
+      <span id="result-mode-label" class="result-sub">BATALHA EM EQUIPE 3v3</span>
+      <h1 id="result-title">VITÓRIA!</h1>
+      <p id="result-summary">Sua equipe dominou a arena!</p>
+      <div class="result-stats-grid" id="result-stats"></div>
+      <div class="result-actions">
+        <button id="btn-play-again" class="btn btn-primary">JOGAR NOVAMENTE</button>
+        <button id="btn-result-menu" class="btn btn-secondary">MENU PRINCIPAL</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
